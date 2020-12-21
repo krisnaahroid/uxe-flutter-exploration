@@ -20,14 +20,101 @@ class MyApp extends StatelessWidget {
             child: Column(
               children: [
                 HomescreenNavbar(),
-                RecentCourseCard(
-                  course: recentCourses[0],
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        "Recents",
+                        style: kLargeTitleStyle,
+                      ),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Text(
+                        "23 Courses, more coming",
+                        style: kSubtitleStyle,
+                      )
+                    ],
+                  ),
                 ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                RecentCourseList(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class RecentCourseList extends StatefulWidget {
+  @override
+  _RecentCourseListState createState() => _RecentCourseListState();
+}
+
+class _RecentCourseListState extends State<RecentCourseList> {
+  List<Container> indicator = [];
+  int currentPage = 0;
+
+  Widget updateIndicator() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: recentCourses.map(
+        (course) {
+          var index = recentCourses.indexOf(course);
+          return Container(
+            width: index == currentPage ? 25.0 : 8.0,
+            height: 8.0,
+            margin: EdgeInsets.symmetric(
+              horizontal: 6.0,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: index == currentPage ? Colors.blue : Colors.grey,
+            ),
+          );
+        },
+      ).toList(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: 320.0,
+          width: double.infinity,
+          child: PageView.builder(
+            itemBuilder: (context, index) {
+              return Opacity(
+                opacity: currentPage == index ? 1.0 : 0.5,
+                child: RecentCourseCard(
+                  course: recentCourses[index],
+                ),
+              );
+            },
+            itemCount: recentCourses.length,
+            controller: PageController(
+              initialPage: 0,
+              viewportFraction: 0.63,
+            ),
+            onPageChanged: (index) {
+              setState(() {
+                currentPage = index;
+              });
+            },
+          ),
+        ),
+        updateIndicator(),
+      ],
     );
   }
 }
